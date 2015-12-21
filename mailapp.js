@@ -13,6 +13,19 @@ var SMTPServer = require('smtp-server').SMTPServer;
 var server = new SMTPServer({
     secure: true,
     key: fs.readFileSync(path.join(__dirname, 'sec', 'yuanamarry.me.key')),
-    cert: fs.readFileSync(path.join(__dirname, 'sec', 'yuanamarry.me.crt'))
+    cert: fs.readFileSync(path.join(__dirname, 'sec', 'yuanamarry.me.crt')),
+    onConnect: function(session, callback){
+        console.log("on connect: " + session);
+        return callback();
+    }, 
+    onRcptTo: function(address, session, callback){
+        console.log("on receive: " + session);
+        return callback(); // Accept the address
+    },
+    onData: function(stream, session, callback){
+      stream.pipe(process.stdout); // print message to console
+      stream.on('end', callback);
+    }
 });
+
 server.listen(3333);
